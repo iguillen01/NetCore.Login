@@ -1,0 +1,91 @@
+﻿@page
+@model NetCoreLogin.Pages.LoginModel
+@{
+}
+
+<div class="container-fluid d-none d-lg-block bg-light m-0 border-bottom border-top">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb bg-light m-0">
+                        <li class="breadcrumb-item">Index</li>
+                        <li class="breadcrumb-item active">Login</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container d-flex flex-column">
+    <div class="d-flex flex-column flex-md-row justify-content-center flex-md-row-reverse mt-4 mb-4">
+
+        <form id="login" class="col-12 col-lg-4 col-md-6 bg-white shadow border rounded p-5">
+            <p class="m-0">Ingresar a</p> <h3 class="text-primary"><b>Mi Portal de Estudiante</b></h3>
+            <hr />
+            <div id="errorMessage" class="alert alert-danger d-none"></div>
+
+            <div class="form-outline mb-4">
+                <label class="form-label" for="emal">Correo electrónico</label>
+                <input type="text" id="email" name="email" placeholder="Ingrese su correo electrónico" class="form-control" value="">
+            </div>
+            <div class="form-outline mb-4">
+                <label class="form-label" for="password">Contraseña</label>
+                <input type="password" id="password" name="password" placeholder="Ingrese su contraseña" class="form-control" value="">
+            </div>
+            <button id="btnLogin" type="button" class="btn btn-primary w-100 mb-4" onclick="login()">Iniciar sesión</button>
+        </form>
+
+        <div class="d-flex flex-column justify-content-end col-md-6 col-lg-8 text-white mi-admin rounded border">
+            <h1 class="display-5 p-5 m-0 align-items-end">Login</h1>
+        </div>
+
+        <script>
+            function login() {
+                document.getElementById("errorMessage").classList.add("d-none");
+                document.getElementById("btnLogin").disabled = true;
+
+                var formData = {
+                    email: document.getElementById("email").value,
+                    password: document.getElementById("password").value
+                };
+
+                fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                })
+                .then(response => {
+                    
+                    document.getElementById("btnLogin").disabled = false;
+                    if (response.ok) {
+                        return response.text();
+                    } else {
+                       throw new Error('Network response was not ok');
+                    }
+                })
+                .then(data => {
+                    if (data === "ok") {
+                        document.getElementById("errorMessage").textContent = "Inicio de sesión exitoso. Redirigiendo...";
+                        alert("Será redirigido a la página principal...")
+                        setTimeout(function () {
+                            window.location.href = '/Home';
+                        }, 1000);
+                    } else if (data === "invalid email") {
+                        document.getElementById("errorMessage").classList.remove("d-none");
+                        document.getElementById("errorMessage").textContent = "Correo electrónico inválido";
+                    } else {
+                        document.getElementById("errorMessage").classList.remove("d-none");
+                        document.getElementById("errorMessage").textContent = "Inicio de sesión inválido";
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+        </script>
+    </div>
+</div>
